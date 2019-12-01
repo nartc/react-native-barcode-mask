@@ -1,0 +1,79 @@
+{
+  "name": "react-native-barcode-mask",
+  "version": "0.1.0",
+  "license": "MIT",
+  "author": "Chau Tran",
+  "main": "dist/index.js",
+  "module": "dist/react-native-barcode-mask.esm.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nartc/react-native-barcode-mask.git"
+  },
+  "scripts": {
+    "start": "tsdx watch",
+    "build": "tsdx build",
+    "test": "tsdx test --env=jsdom",
+    "lint": "lint-staged",
+    "commit": "git-cz",
+    "semantic-release": "semantic-release"
+  },
+  "peerDependencies": {
+    "react": ">=16",
+    "react-native": ">=0.60",
+    "react-native-camera": ">=3",
+    "react-native-reanimated": ">=1.4"
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
+  "config": {
+    "commitizen": {
+      "path": "node_modules/cz-conventional-changelog"
+    }
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "yarn lint"
+    }
+  },
+  "lint-staged": {
+    "{src}/**/*.ts": [
+      "prettier --write",
+      "git add"
+    ]
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "prettier": {
+    "printWidth": 80,
+    "semi": true,
+    "singleQuote": true,
+    "trailingComma": "es5"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "8.2.0",
+    "@commitlint/config-conventional": "8.2.0",
+    "@types/jest": "24.0.23",
+    "@types/react": "16.9.13",
+    "@types/react-native": "0.60.23",
+    "commitizen": "4.0.3",
+    "cz-conventional-changelog": "3.0.2",
+    "husky": "3.1.0",
+    "lint-staged": "9.5.0",
+    "react": "16.12.0",
+    "react-native": "0.61.5",
+    "react-native-camera": "3.13.0",
+    "react-native-reanimated": "1.4.0",
+    "semantic-release": "15.13.31",
+    "tsdx": "0.11.0",
+    "tslib": "1.10.0",
+    "typescript": "3.7.2"
+  }
+}

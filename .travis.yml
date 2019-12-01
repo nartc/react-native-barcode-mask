@@ -1,0 +1,15 @@
+language: node_js
+cache:
+  directories:
+    - ~/.npm
+notifications:
+  email: false
+node_js:
+  - '12'
+before_script:
+  - yarn build
+script:
+  - if [ "$TRAVIS_BRANCH" = "master" -a "$TRAVIS_PULL_REQUEST" = "false" ]; then yarn semantic-release; fi
+branches:
+  except:
+    - /^v\d+\.\d+\.\d+$/
