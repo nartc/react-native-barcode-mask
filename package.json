@@ -1,6 +1,6 @@
 {
   "name": "react-native-barcode-mask",
-  "version": "0.1.0",
+  "version": "0.0.0-development",
   "license": "MIT",
   "author": "Chau Tran",
   "main": "dist/index.js",
@@ -71,7 +71,7 @@
     "react-native": "0.61.5",
     "react-native-camera": "3.13.0",
     "react-native-reanimated": "1.4.0",
-    "semantic-release": "15.13.31",
+    "semantic-release": "^15.13.31",
     "tsdx": "0.11.0",
     "tslib": "1.10.0",
     "typescript": "3.7.2"
