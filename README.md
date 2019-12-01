@@ -1,5 +1,8 @@
 # @nartc/react-native-barcode-mask
 
+![QR](https://i.imgur.com/CRImCD7.gif)
+![PDF417](https://i.imgur.com/Q6Q65ox.gif)
+
 ### Acknowledgement
 
 I want to acknowledge the current [react-native-barcode-mask](https://github.com/shahnawaz/react-native-barcode-mask) library. Most of `@nartc/react-native-barcode-mask` is "cloned" from the original but rewritten with [React Hooks](https://reactjs.org/docs/hooks-intro.html) and [Reanimated](https://github.com/software-mansion/react-native-reanimated)
