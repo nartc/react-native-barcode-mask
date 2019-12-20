@@ -2,7 +2,7 @@ import React, { ComponentType, PureComponent } from 'react';
 import { LayoutChangeEvent } from 'react-native';
 import { BoundingRect, Optionalize, WithOuterLayoutProps } from '../interfaces';
 
-interface WithOuterLayoutHocState {
+export interface WithOuterLayoutHocState {
   boundingRect: BoundingRect;
 }
 
