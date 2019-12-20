@@ -24,8 +24,11 @@ const useCustomBarcodeRead = Platform.select({
   ios: useCustomBarcodeReadIOS,
 });
 
+const BarcodeMaskWithOuterLayout = withOuterLayout(BarcodeMask);
+
 export {
   BarcodeMask,
+  BarcodeMaskWithOuterLayout,
   useBarcodeRead,
   useCustomBarcodeRead,
   CustomBarcodeRead,
