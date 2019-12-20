@@ -1,7 +1,7 @@
 import React, { FC, memo } from 'react';
 import { LayoutChangeEvent, StyleSheet, View, ViewStyle } from 'react-native';
 import Animated, { Easing } from 'react-native-reanimated';
-import { BoundingRect, WithOuterLayoutProps } from './interfaces';
+import { WithOuterLayoutProps } from './interfaces';
 
 const { Value, Clock, block, cond, set, startClock, timing, eq } = Animated;
 
@@ -24,7 +24,7 @@ export type OnLayoutChangeHandler = (event: LayoutChangeEvent) => void;
  * @name BarcodeMaskProps
  * @description Props of BarcodeMask component
  */
-export interface BarcodeMaskProps extends Partial<WithOuterLayoutProps> {
+export interface BarcodeMaskProps extends WithOuterLayoutProps {
   /**
    * @name width
    * @type DimensionUnit
@@ -218,31 +218,28 @@ export const BarcodeMask: FC<BarcodeMaskProps> = memo(
     outerBoundingRect,
     onOuterLayout,
   }) => {
-    const {
-      height: outerHeight,
-      width: outerWidth,
-    } = outerBoundingRect as BoundingRect;
-
     const _animatedLineDimension = (
       dimension: DimensionUnit | undefined,
-      outerDimension: number
+      outerDimension: 'width' | 'height'
     ) => {
+      const outer = outerBoundingRect?.[outerDimension] ?? 0;
+
       if (dimension) {
         if (typeof dimension === 'number') {
           return dimension * 0.9;
         }
 
         return dimension.endsWith('%')
-          ? Number(dimension.split('%')[0]) * outerDimension * 0.9
+          ? Number(dimension.split('%')[0]) * outer * 0.9
           : dimension;
       }
 
-      return outerDimension * 0.9;
+      return outer * 0.9;
     };
 
     const _animatedValue = (
       dimension: DimensionUnit | undefined,
-      outerDimension: number
+      outerDimension: 'width' | 'height'
     ) => {
       const calculatedDimension = _animatedLineDimension(
         dimension,
@@ -261,7 +258,7 @@ export const BarcodeMask: FC<BarcodeMaskProps> = memo(
 
     const _animatedLineStyle = () => {
       if (animatedLineOrientation === 'horizontal') {
-        const { dimension, destination } = _animatedValue(width, outerWidth);
+        const { dimension, destination } = _animatedValue(width, 'width');
         return {
           ...styles.animatedLine,
           height: animatedLineThickness,
@@ -276,7 +273,7 @@ export const BarcodeMask: FC<BarcodeMaskProps> = memo(
         };
       }
 
-      const { dimension, destination } = _animatedValue(height, outerHeight);
+      const { dimension, destination } = _animatedValue(height, 'height');
       return {
         ...styles.animatedLine,
         width: animatedLineThickness,
@@ -350,8 +347,8 @@ export const BarcodeMask: FC<BarcodeMaskProps> = memo(
       );
     };
 
-    const _width = _animatedLineDimension(width, outerWidth);
-    const _height = _animatedLineDimension(height, outerHeight);
+    const _width = _animatedLineDimension(width, 'width');
+    const _height = _animatedLineDimension(height, 'height');
 
     return (
       <View style={styles.container}>

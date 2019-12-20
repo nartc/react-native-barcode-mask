@@ -1,4 +1,4 @@
-import React, { FunctionComponent, PureComponent } from 'react';
+import React, { ComponentType, PureComponent } from 'react';
 import { LayoutChangeEvent } from 'react-native';
 import { BoundingRect, Optionalize, WithOuterLayoutProps } from '../interfaces';
 
@@ -9,7 +9,7 @@ interface WithOuterLayoutHocState {
 export const withOuterLayout = <
   T extends WithOuterLayoutProps = WithOuterLayoutProps
 >(
-  WrappedComponent: FunctionComponent<T>
+  WrappedComponent: ComponentType<T>
 ) => {
   const displayName =
     WrappedComponent.displayName || WrappedComponent.name || 'Component';
