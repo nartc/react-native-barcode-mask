@@ -1,3 +1,4 @@
+import { CustomBarcodeRead } from 'interfaces';
 import { useCallback, useRef, useState } from 'react';
 import { LayoutChangeEvent } from 'react-native';
 
@@ -5,10 +6,12 @@ import { LayoutChangeEvent } from 'react-native';
  * @internal
  * @param dataProcessor
  * @param onScannedData
+ * @param customBarcodeRead
  */
 export default (
   dataProcessor: (data: string) => string,
-  onScannedData: (processed: string) => void
+  onScannedData: (processed: string) => void,
+  customBarcodeRead?: CustomBarcodeRead
 ) => {
   const [barcodeRead, setBarcodeRead] = useState(false);
   const [
@@ -36,18 +39,18 @@ export default (
   );
 
   const processingReadBarcode = (data: string) => {
-    setBarcodeRead(true);
+    customBarcodeRead?.beforeScan?.() || setBarcodeRead(true);
     const processed = dataProcessor(data);
 
     if (processed) {
       onScannedData(processed);
     }
 
-    setBarcodeRead(false);
+    customBarcodeRead?.afterScan?.() || setBarcodeRead(false);
   };
 
   return {
-    barcodeRead,
+    barcodeRead: customBarcodeRead ? null : barcodeRead,
     finderX: finderX.current,
     finderY: finderY.current,
     finderWidth: finderWidth.current,

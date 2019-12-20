@@ -8,28 +8,18 @@
  * @format
  */
 
-import React, { useRef } from 'react';
+import React, {useRef} from 'react';
 import {SafeAreaView, StatusBar, StyleSheet} from 'react-native';
 import {RNCamera} from 'react-native-camera';
-import {BarcodeMask, useBarcodeRead} from '../src';
+import { BarcodeMask } from '@nartc/react-native-barcode-mask';
 
 const App = () => {
-  const {onBarcodeRead, barcodeRead} = useBarcodeRead(
-    true,
-    barcode => {
-      console.log(barcode);
-      return barcode;
-    },
-    processed => {
-      console.log(processed);
-    },
-  );
-
   const rnCamera = useRef<RNCamera>(null);
+
   return (
     <>
       <StatusBar barStyle="dark-content" />
-      <SafeAreaView>
+      <SafeAreaView style={{flex: 1}}>
         <RNCamera
           ref={rnCamera}
           androidCameraPermissionOptions={{
@@ -40,10 +30,9 @@ const App = () => {
           }}
           style={styles.scanner}
           type={RNCamera.Constants.Type.back}
-          barCodeTypes={barcodeRead ? [] : [RNCamera.Constants.BarCodeType.qr]}
-          onBarCodeRead={onBarcodeRead}
+          barCodeTypes={[RNCamera.Constants.BarCodeType.qr]}
           captureAudio={false}>
-          <BarcodeMask />
+          <BarcodeMask width={200} height={200}/>
         </RNCamera>
       </SafeAreaView>
     </>
@@ -57,5 +46,4 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
 });
-
 export default App;
