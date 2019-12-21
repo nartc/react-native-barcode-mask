@@ -1,5 +1,7 @@
 # @nartc/react-native-barcode-mask
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/nartc/react-native-barcode-mask.svg)](https://greenkeeper.io/)
+
 ![QR](https://i.imgur.com/CRImCD7.gif)
 ![PDF417](https://i.imgur.com/Q6Q65ox.gif)
 
