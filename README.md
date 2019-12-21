@@ -112,6 +112,57 @@ On iOS, this feature works very well and stable.
 
 However, on Android, this feature isn't as stable because of the randomness of the bounds returned. The bounds returned are differently based on the `barcodeType` as well. For my specific case, I use `QR` and `PDF417` so I was able to identify the bounds for these two types, even so it's not very reliable for `PDF417`. Contributions/Suggestions are definitely welcomed to improve support for Android.
 
+### useCustomBarcodeRead
+
+A new Hook is introduced: `useCustomBarcodeRead`
+
+The purpose of this hook is to provide customization to how the Mask will handle barcode read within the Mask's bounds. On iOS, you probably don't need to worry about this because the mask works pretty stable. However on Android, because of the randomness of the bounds and device's coordinate system, this hook will allow the consumers to customize the BarcodeMask internal functionality instead of introducing a fix for a variety of Android devices which would take, probably forever, to complete.
+
+Just like the normal `useBarcodeRead()`, `useCustomBarcodeRead` takes in: `isFocused`, `dataProcessor` function and `processedData` callback function. In addition, it also takes in two new parameters:
+
+1. `customBarcodeRead`: This is an object with two properties: `beforeScan` and `afterScan`. The idea is to provide customization to how `BarcodeMask` affects the `RNCamera`. With `useBarcodeRead`, the returned flag `barcodeRead` is used to turn on/off scanning ability by setting the `barcodeTypes` to an `[]` when `barcodeRead` is `true`. Internally, it's just a `useState` and `setBarcodeRead(true/false)` is called at a certain point. With this new hook, you can setup a state at your component's level and pass two callbacks `beforeScan` and `afterScan`, `BarcodeMask` will call those at the same point it calls the internal `useState`. `beforeScan` and `afterScan`, if provided, will override the internal `useState`.
+
+```typescript jsx
+const [customBarcodeRead, setCustomBarcodeRead] = useState(false);
+const {} = useCustomBarcodeRead(isFocused, dataProcessor, processedData => {/*do stuff*/}, {beforeScan: () => { setCustomBarcodeRead(true); }, afterScan: () => { setCustomBarcodeRead(false) }});
+```
+
+**NOTE:** When `beforeScan` and `afterScan` are provided, internal `barcodeRead` state will be returned as `null`.
+
+2. `customBarcodeReadCallback`: This is a callback with the following signature. It's a function that returns the `RNCamera's BarcodeRead` callback.
+
+```typescript
+export interface CustomBarcodeReadCallback {
+  (
+    finderBoundingRect: { x: number; y: number; width: number; height: number },
+    isFinderBoundingInitialized: boolean,
+    processingBarcodeFn: (data: string) => void
+  ): (event: {
+    data: string;
+    bounds:
+      | { width: number; height: number; origin: Array<Point<string>> }
+      | { origin: Point<string>; size: Size<string> };
+    type: keyof BarCodeType;
+  }) => void;
+}
+```
+
+Basically, `BarcodeMask` will now delegate the helpful data: `finderBoundingRect`, `isFinderBoundingInitialized` and the `processedData` function that you pass in `useCustomBarcodeRead` in the beginning for the consumers to handle the dimensions related issue.
+
+1. `finderBoundingRect`: the dimensions of the `BarcodeMask` calculated from top-left `edgeCorner`. 
+2. `isFinderBoundingInitialized`: a flag to notify when the `BarcodeMask` is finished initialized.
+3. `processBarcodeFn`: this is the combined function with the logic of: `dataProcessor`, `processedData` and `customBarcodeRead` (if provided). This function takes in `event.data` (raw barcode data) and run through `dataProcessor` and ultimately ends up calling `processedData()` function.
+
+### BarcodeMaskWithOuterLayout
+
+A new HOC is added and is exported as `withOuterLayout(BarcodeMask)` and named `BarcodeMaskWithOuterLayout`. If you want to explore `withOuterLayout`, feel free to.
+
+The purpose of this component is to be able to use percentage value for `width` and `height`. For example, I want to setup a mask with a set `width` but I want the `height` of the mask to take up the `height` of the `RNCamera` component, then `BarcodeMaskWithOuterLayout` will help me achieve that.
+
+```typescript jsx
+<BarcodeMaskWithOuterLayout width={200} height={'100%'} />
+```
+
 ### Contributions
 
 As mentioned, contributions are always welcomed.
