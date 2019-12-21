@@ -2,19 +2,28 @@
  * Sample React Native App
  * https://github.com/facebook/react-native
  *
- * Generated with the TypeScript template
- * https://github.com/react-native-community/react-native-template-typescript
- *
  * @format
+ * @flow
  */
+
+// @ts-check
+/** @type {import("./@nartc/react-native-barcode-mask/src/index")} */
 
 import React, {useRef} from 'react';
 import {SafeAreaView, StatusBar, StyleSheet} from 'react-native';
 import {RNCamera} from 'react-native-camera';
-import { BarcodeMask } from '@nartc/react-native-barcode-mask';
+import {
+  BarcodeMaskWithOuterLayout,
+  useCustomBarcodeRead,
+} from './@nartc/react-native-barcode-mask/react-native-barcode-mask.esm';
 
 const App = () => {
-  const rnCamera = useRef<RNCamera>(null);
+  const rnCamera = useRef(null);
+  const {onBarcodeFinderLayoutChange, onBarcodeRead} = useCustomBarcodeRead(true, data => data, console.log, null, res => {
+    return event => {
+      console.log(res, event);
+    }
+  });
 
   return (
     <>
@@ -31,8 +40,9 @@ const App = () => {
           style={styles.scanner}
           type={RNCamera.Constants.Type.back}
           barCodeTypes={[RNCamera.Constants.BarCodeType.qr]}
+          onBarCodeRead={onBarcodeRead}
           captureAudio={false}>
-          <BarcodeMask width={200} height={200}/>
+          <BarcodeMaskWithOuterLayout maskOpacity={0.5} height={'100%'} />
         </RNCamera>
       </SafeAreaView>
     </>
@@ -46,4 +56,5 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
 });
+
 export default App;

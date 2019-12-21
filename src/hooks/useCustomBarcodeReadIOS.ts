@@ -1,7 +1,7 @@
-import useBarcodeFinder from './useBarcodeFinder';
 import { CustomBarcodeRead, CustomBarcodeReadCallback } from 'interfaces';
 import { useCallback } from 'react';
 import { BarCodeType, Point, Size } from 'react-native-camera';
+import useBarcodeFinder from './useBarcodeFinder';
 
 export default (
   isFocused: boolean,
@@ -11,6 +11,7 @@ export default (
   customBarcodeReadCallback: CustomBarcodeReadCallback
 ) => {
   const {
+    barcodeRead,
     onBarcodeFinderLayoutChange,
     finderHeight,
     finderWidth,
@@ -57,6 +58,7 @@ export default (
   );
 
   return {
+    barcodeRead,
     onBarcodeRead: customBarcodeReadCallback
       ? customBarcodeReadCallback(
           {

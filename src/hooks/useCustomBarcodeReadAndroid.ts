@@ -12,6 +12,7 @@ export default (
   customBarcodeReadCallback: CustomBarcodeReadCallback
 ) => {
   const {
+    barcodeRead,
     onBarcodeFinderLayoutChange,
     isFinderBoundingInitialized,
     finderY,
@@ -103,6 +104,7 @@ export default (
   );
 
   return {
+    barcodeRead,
     onBarcodeRead: customBarcodeReadCallback
       ? customBarcodeReadCallback(
           {

@@ -230,8 +230,8 @@ export const BarcodeMask: FC<BarcodeMaskProps> = memo(
         }
 
         return dimension.endsWith('%')
-          ? Number(dimension.split('%')[0]) * outer * 0.9
-          : dimension;
+          ? (Number(dimension.split('%')[0]) / 100) * outer * 0.9
+          : Number(dimension.split(/\d+/)[0]) * outer * 0.9;
       }
 
       return outer * 0.9;
@@ -245,24 +245,19 @@ export const BarcodeMask: FC<BarcodeMaskProps> = memo(
         dimension,
         outerDimension
       );
-      const fullDimension =
-        (typeof calculatedDimension === 'number'
-          ? calculatedDimension
-          : Number(calculatedDimension.split(/\d+/)[0])) / 0.9;
+      const fullDimension = calculatedDimension / 0.9;
 
-      return {
-        destination: fullDimension - (animatedLineThickness as number),
-        dimension: calculatedDimension,
-      };
+      return fullDimension - (animatedLineThickness as number);
     };
 
     const _animatedLineStyle = () => {
       if (animatedLineOrientation === 'horizontal') {
-        const { dimension, destination } = _animatedValue(width, 'width');
+        const _width = _animatedLineDimension(width, 'width');
+        const destination = _animatedValue(height, 'height');
         return {
           ...styles.animatedLine,
           height: animatedLineThickness,
-          width: dimension,
+          width: _width,
           backgroundColor: animatedLineColor,
           top: runTimingFn!(
             new Clock(),
@@ -273,11 +268,12 @@ export const BarcodeMask: FC<BarcodeMaskProps> = memo(
         };
       }
 
-      const { dimension, destination } = _animatedValue(height, 'height');
+      const _height = _animatedLineDimension(height, 'height');
+      const destination = _animatedValue(width, 'width');
       return {
         ...styles.animatedLine,
         width: animatedLineThickness,
-        height: dimension,
+        height: _height,
         backgroundColor: animatedLineColor,
         left: runTimingFn!(
           new Clock(),
@@ -347,8 +343,8 @@ export const BarcodeMask: FC<BarcodeMaskProps> = memo(
       );
     };
 
-    const _width = _animatedLineDimension(width, 'width');
-    const _height = _animatedLineDimension(height, 'height');
+    const _width = _animatedLineDimension(width, 'width') / 0.9;
+    const _height = _animatedLineDimension(height, 'height') / 0.9;
 
     return (
       <View style={styles.container}>
