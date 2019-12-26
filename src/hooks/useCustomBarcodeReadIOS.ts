@@ -1,7 +1,6 @@
 import { CustomBarcodeRead, CustomBarcodeReadCallback } from 'interfaces';
-import { useCallback } from 'react';
-import { BarCodeType, Point, Size } from 'react-native-camera';
 import useBarcodeFinder from './useBarcodeFinder';
+import useInternalBarcodeRead from './useInternalBarcodeRead';
 
 export default (
   isFocused: boolean,
@@ -21,42 +20,6 @@ export default (
     processingReadBarcode,
   } = useBarcodeFinder(dataProcessor, onScannedData, customBarcodeRead);
 
-  const _onBarcodeRead = useCallback(
-    (event: {
-      data: string;
-      bounds:
-        | { width: number; height: number; origin: Array<Point<string>> }
-        | { origin: Point<string>; size: Size<string> };
-      type: keyof BarCodeType;
-    }) => {
-      if (!isFinderBoundingInitialized) {
-        return;
-      }
-
-      const {
-        origin: { x, y },
-        size: { width, height },
-      } = event.bounds as { origin: Point<string>; size: Size<string> };
-      if (
-        Number(x) >= finderX &&
-        Number(x) + Number(width) <= finderX + finderWidth &&
-        Number(y) >= finderY &&
-        Number(y) + Number(height) <= finderY + finderHeight
-      ) {
-        processingReadBarcode(event.data);
-        return;
-      }
-    },
-    [
-      isFocused,
-      isFinderBoundingInitialized,
-      finderX,
-      finderY,
-      finderWidth,
-      finderHeight,
-    ]
-  );
-
   return {
     barcodeRead,
     onBarcodeRead: customBarcodeReadCallback
@@ -70,7 +33,15 @@ export default (
           isFinderBoundingInitialized,
           processingReadBarcode
         )
-      : _onBarcodeRead,
+      : useInternalBarcodeRead(
+          isFocused,
+          isFinderBoundingInitialized,
+          finderX,
+          finderY,
+          finderWidth,
+          finderHeight,
+          processingReadBarcode
+        ),
     onBarcodeFinderLayoutChange,
   };
 };
