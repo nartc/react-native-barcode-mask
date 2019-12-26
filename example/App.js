@@ -9,8 +9,15 @@
 // @ts-check
 /** @type {import("./@nartc/react-native-barcode-mask/src/index")} */
 
-import React, {useRef} from 'react';
-import {SafeAreaView, StatusBar, StyleSheet} from 'react-native';
+import React, {useRef, useState} from 'react';
+import {
+  Button,
+  SafeAreaView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import {RNCamera} from 'react-native-camera';
 import {
   BarcodeMaskWithOuterLayout,
@@ -19,16 +26,52 @@ import {
 
 const App = () => {
   const rnCamera = useRef(null);
-  const {onBarcodeFinderLayoutChange, onBarcodeRead} = useCustomBarcodeRead(true, data => data, console.log, null, res => {
-    return event => {
-      console.log(res, event);
-    }
-  });
+  const [barcodeReadCount, setBarcodeReadCount] = useState(0);
+  const [barcodeReadAware, setBarcodeReadAware] = useState(false);
+  const [barcodeRead, setBarcodeRead] = useState(false);
+  const {onBarcodeFinderLayoutChange, onBarcodeRead} = useCustomBarcodeRead(
+    true,
+    data => data,
+    processed => {
+      console.log(processed, {barcodeReadCount});
+      setBarcodeReadCount(prev => prev + 1);
+    },
+    {
+      beforeScan: () => {
+        setBarcodeRead(true);
+      },
+      afterScan: () => {},
+    },
+    (a, b, c) => {
+      return event => {
+        c(event.data);
+      };
+    },
+  );
 
   return (
     <>
       <StatusBar barStyle="dark-content" />
       <SafeAreaView style={{flex: 1}}>
+        <View style={{flexDirection: 'row'}}>
+          <Button
+            title={'Toggle Barcode Read Aware'}
+            onPress={() => {
+              setBarcodeReadAware(prev => !prev);
+              setBarcodeRead(false);
+              setBarcodeReadCount(0);
+            }}
+          />
+          <Text>{barcodeReadAware.toString()}</Text>
+        </View>
+        <View style={{flexDirection: 'row'}}>
+          <Button
+            title={'Reset Barcode Read'}
+            onPress={() => setBarcodeRead(false)}
+          />
+          <Text>{barcodeRead.toString()}</Text>
+        </View>
+        <Text>Barcode Read Count: {barcodeReadCount}</Text>
         <RNCamera
           ref={rnCamera}
           androidCameraPermissionOptions={{
@@ -39,10 +82,20 @@ const App = () => {
           }}
           style={styles.scanner}
           type={RNCamera.Constants.Type.back}
-          barCodeTypes={[RNCamera.Constants.BarCodeType.qr]}
+          barCodeTypes={
+            barcodeReadAware
+              ? barcodeRead
+                ? []
+                : [RNCamera.Constants.BarCodeType.qr]
+              : [RNCamera.Constants.BarCodeType.qr]
+          }
           onBarCodeRead={onBarcodeRead}
           captureAudio={false}>
-          <BarcodeMaskWithOuterLayout maskOpacity={0.5} height={'100%'} />
+          <BarcodeMaskWithOuterLayout
+            maskOpacity={0.5}
+            height={'90%'}
+            onLayoutChange={onBarcodeFinderLayoutChange}
+          />
         </RNCamera>
       </SafeAreaView>
     </>
