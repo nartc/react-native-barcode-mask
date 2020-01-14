@@ -73,7 +73,7 @@
     "react-native-camera": "3.15.0",
     "react-native-reanimated": "1.4.0",
     "semantic-release": "16.0.1",
-    "tsdx": "0.12.2",
+    "tsdx": "0.12.3",
     "tslib": "1.10.0",
     "typescript": "3.7.4"
   }
