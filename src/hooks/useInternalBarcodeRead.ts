@@ -140,4 +140,4 @@ const useInternalBarcodeReadAndroid = (
 export default Platform.select({
   android: useInternalBarcodeReadAndroid,
   ios: useInternalBarcodeReadIOS,
-});
+}) as typeof useInternalBarcodeReadAndroid;

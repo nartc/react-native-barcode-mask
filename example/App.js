@@ -21,44 +21,59 @@ import {
 import {RNCamera} from 'react-native-camera';
 import {
   BarcodeMaskWithOuterLayout,
-  useCustomBarcodeRead,
+  useBarcodeRead,
 } from './@nartc/react-native-barcode-mask/react-native-barcode-mask.esm';
 
 const App = () => {
   const rnCamera = useRef(null);
   const [barcodeReadCount, setBarcodeReadCount] = useState(0);
   const [barcodeReadAware, setBarcodeReadAware] = useState(false);
-  const [barcodeRead, setBarcodeRead] = useState(false);
-  const {onBarcodeFinderLayoutChange, onBarcodeRead} = useCustomBarcodeRead(
+  // const [barcodeRead, setBarcodeRead] = useState(false);
+  // const {onBarcodeFinderLayoutChange, onBarcodeRead} = useCustomBarcodeRead(
+  //   true,
+  //   data => data,
+  //   processed => {
+  //     console.log(processed, {barcodeReadCount});
+  //     setBarcodeReadCount(prev => prev + 1);
+  //   },
+  //   {
+  //     beforeScan: () => {
+  //       setBarcodeRead(true);
+  //     },
+  //     afterScan: () => {},
+  //   },
+  //   (a, b, c) => {
+  //     return event => {
+  //       c(event.data);
+  //     };
+  //   },
+  // );
+  const {
+    barcodeRead,
+    onBarcodeRead,
+    onBarcodeFinderLayoutChange,
+  } = useBarcodeRead(
     true,
     data => data,
     processed => {
-      console.log(processed, {barcodeReadCount});
-      setBarcodeReadCount(prev => prev + 1);
-    },
-    {
-      beforeScan: () => {
-        setBarcodeRead(true);
-      },
-      afterScan: () => {},
-    },
-    (a, b, c) => {
-      return event => {
-        c(event.data);
-      };
+      console.log(processed);
     },
   );
 
   return (
     <>
       <StatusBar barStyle="dark-content" />
-      <SafeAreaView style={{flex: 1}}>
+      <SafeAreaView
+        style={{
+          flex: 1,
+          flexDirection: 'column',
+        }}>
         <View style={{flexDirection: 'row'}}>
           <Button
             title={'Toggle Barcode Read Aware'}
             onPress={() => {
               setBarcodeReadAware(prev => !prev);
-              setBarcodeRead(false);
+              // setBarcodeRead(false);
               setBarcodeReadCount(0);
             }}
           />
@@ -67,7 +82,9 @@ const App = () => {
         <View style={{flexDirection: 'row'}}>
           <Button
             title={'Reset Barcode Read'}
-            onPress={() => setBarcodeRead(false)}
+            onPress={() => {
+              // setBarcodeRead(false);
+            }}
           />
           <Text>{barcodeRead.toString()}</Text>
         </View>
@@ -93,7 +110,8 @@ const App = () => {
           captureAudio={false}>
           <BarcodeMaskWithOuterLayout
             maskOpacity={0.5}
-            height={'90%'}
+            height={'80%'}
+            width={'80%'}
             onLayoutChange={onBarcodeFinderLayoutChange}
           />
         </RNCamera>
@@ -105,8 +123,8 @@ const App = () => {
 const styles = StyleSheet.create({
   scanner: {
     flex: 1,
-    width: '100%',
-    overflow: 'hidden',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
   },
 });
 
