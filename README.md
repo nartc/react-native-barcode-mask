@@ -95,6 +95,7 @@ const {
 1. `isFocused`: If you're using `react-navigation` then you should be familiar (or should get familiarized) with the concept of `focus`. When you navigate to a screen on the same `Stack` (or different `Tab`), the previous (current) screen is not **unmounted**, but only **unfocused**. `RNCamera` requires you to reinitialize when a screen is `re-focus`. `react-navigation` provides multiple ways to get access to `isFocused` property. If you don't use `react-navigation`, you can just pass in `true`
 2. `(barcodeData: string) => string`: This is a callback to process barcode **raw** data. This gets exposed so you can apply your own logic to process the raw data.
 3. `(processedData: string) => void`: This is a callback that takes in the `processedData`. This is where you **want** to do with the processed barcode data: call API, or navigating to a different screen etc...
+4. `barcodeReadDelay: number`: `useBarcodeRead` now takes in an optional `delay` which will handle the frequency of scanning barcode internally, instead of using `barcodeRead` to manipulate `barcodeTypes`. Default to `500ms`
 
 `useBarcodeRead` returns the following:
 
@@ -105,6 +106,7 @@ const {
   barcodeTypes={barcodeRead ? [] : [RNCamera.Constants.BarCodeType.qr]}
 />
 ```
+**NOTE: I noticed that this trick "kind of stopped" working since couple of the latest issue ago. Haven't looked into the commit log of `react-native-camera` but `barcodeRead` is returned for the sake of `barcodeRead`, frequency of scanning barcode is handled internally now.**
 
 2. `onBarcodeRead`: This is a handler that the hook returns so you can pass to `onBarCodeRead` prop on `RNCamera`
 3. `onBarcodeFinderLayoutChange`: This is a handler that the hook returns so you can pass to `onLayoutChange` prop on `BarcodeMask`
@@ -151,7 +153,7 @@ export interface CustomBarcodeReadCallback {
 
 Basically, `BarcodeMask` will now delegate the helpful data: `finderBoundingRect`, `isFinderBoundingInitialized` and the `processedData` function that you pass in `useCustomBarcodeRead` in the beginning for the consumers to handle the dimensions related issue.
 
-1. `finderBoundingRect`: the dimensions of the `BarcodeMask` calculated from top-left `edgeCorner`. 
+1. `finderBoundingRect`: the dimensions of the `BarcodeMask` calculated from top-left `edgeCorner`.
 2. `isFinderBoundingInitialized`: a flag to notify when the `BarcodeMask` is finished initialized.
 3. `processBarcodeFn`: this is the combined function with the logic of: `dataProcessor`, `processedData` and `customBarcodeRead` (if provided). This function takes in `event.data` (raw barcode data) and run through `dataProcessor` and ultimately ends up calling `processedData()` function.
 
