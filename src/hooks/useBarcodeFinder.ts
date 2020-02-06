@@ -1,5 +1,5 @@
 import { CustomBarcodeRead } from 'interfaces';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { LayoutChangeEvent } from 'react-native';
 
 /**
@@ -11,17 +11,13 @@ import { LayoutChangeEvent } from 'react-native';
 export default (
   dataProcessor: (data: string) => string,
   onScannedData: (processed: string) => void,
-  customBarcodeRead?: CustomBarcodeRead
+  customBarcodeRead?: CustomBarcodeRead | number
 ) => {
   const [barcodeRead, setBarcodeRead] = useState(false);
-  const [
-    isFinderBoundingInitialized,
-    setIsFinderBoundingInitialized,
-  ] = useState(false);
-  const finderWidth = useRef(0);
-  const finderHeight = useRef(0);
-  const finderX = useRef(0);
-  const finderY = useRef(0);
+  const [finderWidth, setFinderWidth] = useState(0);
+  const [finderHeight, setFinderHeight] = useState(0);
+  const [finderX, setFinderX] = useState(0);
+  const [finderY, setFinderY] = useState(0);
   const _onBarcodeFinderLayoutChange = useCallback(
     (event: LayoutChangeEvent) => {
       const {
@@ -29,33 +25,46 @@ export default (
           layout: { height, width, x, y },
         },
       } = event;
-      finderWidth.current = width;
-      finderHeight.current = height;
-      finderX.current = x;
-      finderY.current = y;
-      setIsFinderBoundingInitialized(true);
+      setFinderWidth(width);
+      setFinderHeight(height);
+      setFinderX(x);
+      setFinderY(y);
     },
-    []
+    [finderX, finderY, finderHeight, finderWidth]
   );
 
-  const processingReadBarcode = (data: string) => {
-    customBarcodeRead?.beforeScan?.() || setBarcodeRead(true);
-    const processed = dataProcessor(data);
+  let timeoutId = 0;
+  let processingReadBarcode: (data: string) => void;
 
-    if (processed) {
-      onScannedData(processed);
-    }
-
-    customBarcodeRead?.afterScan?.() || setBarcodeRead(false);
-  };
+  if (
+    !customBarcodeRead ||
+    (customBarcodeRead && typeof customBarcodeRead === 'number')
+  ) {
+    timeoutId && clearTimeout(timeoutId);
+    processingReadBarcode = data => {
+      setBarcodeRead(true);
+      onScannedData(dataProcessor(data));
+      timeoutId = setTimeout(() => {
+        setBarcodeRead(false);
+      }, customBarcodeRead);
+    };
+  } else {
+    processingReadBarcode = data => {
+      (customBarcodeRead as CustomBarcodeRead)?.beforeScan?.();
+      onScannedData(dataProcessor(data));
+      (customBarcodeRead as CustomBarcodeRead)?.afterScan?.();
+    };
+  }
 
   return {
-    barcodeRead: customBarcodeRead ? null : barcodeRead,
-    finderX: finderX.current,
-    finderY: finderY.current,
-    finderWidth: finderWidth.current,
-    finderHeight: finderHeight.current,
-    isFinderBoundingInitialized,
+    barcodeRead:
+      customBarcodeRead && typeof customBarcodeRead === 'object'
+        ? null
+        : barcodeRead,
+    finderX,
+    finderY,
+    finderWidth,
+    finderHeight,
     onBarcodeFinderLayoutChange: _onBarcodeFinderLayoutChange,
     processingReadBarcode,
   };

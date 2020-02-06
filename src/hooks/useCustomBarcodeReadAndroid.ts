@@ -12,7 +12,6 @@ export default (
   const {
     barcodeRead,
     onBarcodeFinderLayoutChange,
-    isFinderBoundingInitialized,
     finderY,
     finderX,
     finderWidth,
@@ -30,12 +29,11 @@ export default (
             width: finderWidth,
             height: finderHeight,
           },
-          isFinderBoundingInitialized,
           processingReadBarcode
         )
       : useInternalBarcodeRead(
+          barcodeRead != null ? barcodeRead : false,
           isFocused,
-          isFinderBoundingInitialized,
           finderX,
           finderY,
           finderWidth,

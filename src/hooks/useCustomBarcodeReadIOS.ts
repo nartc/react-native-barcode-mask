@@ -16,7 +16,6 @@ export default (
     finderWidth,
     finderX,
     finderY,
-    isFinderBoundingInitialized,
     processingReadBarcode,
   } = useBarcodeFinder(dataProcessor, onScannedData, customBarcodeRead);
 
@@ -30,12 +29,11 @@ export default (
             width: finderWidth,
             height: finderHeight,
           },
-          isFinderBoundingInitialized,
           processingReadBarcode
         )
       : useInternalBarcodeRead(
+          barcodeRead != null ? barcodeRead : false,
           isFocused,
-          isFinderBoundingInitialized,
           finderX,
           finderY,
           finderWidth,

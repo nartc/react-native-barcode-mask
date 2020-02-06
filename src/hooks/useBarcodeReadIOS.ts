@@ -4,22 +4,22 @@ import useInternalBarcodeRead from './useInternalBarcodeRead';
 export default (
   isFocused: boolean,
   dataProcessor: (data: string) => string,
-  onScannedData: (processed: string) => void
+  onScannedData: (processed: string) => void,
+  barcodeReadDelay: number = 500
 ) => {
   const {
     barcodeRead,
     onBarcodeFinderLayoutChange,
-    isFinderBoundingInitialized,
     finderY,
     finderX,
     finderWidth,
     finderHeight,
     processingReadBarcode,
-  } = useBarcodeFinder(dataProcessor, onScannedData);
+  } = useBarcodeFinder(dataProcessor, onScannedData, barcodeReadDelay);
 
   const onBarcodeRead = useInternalBarcodeRead(
+    barcodeRead != null ? barcodeRead : false,
     isFocused,
-    isFinderBoundingInitialized,
     finderX,
     finderY,
     finderWidth,

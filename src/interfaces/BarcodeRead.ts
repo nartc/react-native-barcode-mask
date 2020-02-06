@@ -8,7 +8,6 @@ export interface CustomBarcodeRead {
 export interface CustomBarcodeReadCallback {
   (
     finderBoundingRect: { x: number; y: number; width: number; height: number },
-    isFinderBoundingInitialized: boolean,
     processingBarcodeFn: (data: string) => void
   ): (event: {
     data: string;

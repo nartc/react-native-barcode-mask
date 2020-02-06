@@ -9,7 +9,7 @@
 // @ts-check
 /** @type {import("./@nartc/react-native-barcode-mask/src/index")} */
 
-import React, {useRef, useState} from 'react';
+import React, {useState} from 'react';
 import {
   Button,
   SafeAreaView,
@@ -25,29 +25,8 @@ import {
 } from './@nartc/react-native-barcode-mask/react-native-barcode-mask.esm';
 
 const App = () => {
-  const rnCamera = useRef(null);
   const [barcodeReadCount, setBarcodeReadCount] = useState(0);
   const [barcodeReadAware, setBarcodeReadAware] = useState(false);
-  // const [barcodeRead, setBarcodeRead] = useState(false);
-  // const {onBarcodeFinderLayoutChange, onBarcodeRead} = useCustomBarcodeRead(
-  //   true,
-  //   data => data,
-  //   processed => {
-  //     console.log(processed, {barcodeReadCount});
-  //     setBarcodeReadCount(prev => prev + 1);
-  //   },
-  //   {
-  //     beforeScan: () => {
-  //       setBarcodeRead(true);
-  //     },
-  //     afterScan: () => {},
-  //   },
-  //   (a, b, c) => {
-  //     return event => {
-  //       c(event.data);
-  //     };
-  //   },
-  // );
   const {
     barcodeRead,
     onBarcodeRead,
@@ -90,7 +69,6 @@ const App = () => {
         </View>
         <Text>Barcode Read Count: {barcodeReadCount}</Text>
         <RNCamera
-          ref={rnCamera}
           androidCameraPermissionOptions={{
             title: 'permissionCamera',
             message: 'permissionCameraMessage',
@@ -99,19 +77,13 @@ const App = () => {
           }}
           style={styles.scanner}
           type={RNCamera.Constants.Type.back}
-          barCodeTypes={
-            barcodeReadAware
-              ? barcodeRead
-                ? []
-                : [RNCamera.Constants.BarCodeType.qr]
-              : [RNCamera.Constants.BarCodeType.qr]
-          }
+          barCodeTypes={[RNCamera.Constants.BarCodeType.qr]}
           onBarCodeRead={onBarcodeRead}
           captureAudio={false}>
           <BarcodeMaskWithOuterLayout
             maskOpacity={0.5}
-            height={'80%'}
             width={'80%'}
+            height={'80%'}
             onLayoutChange={onBarcodeFinderLayoutChange}
           />
         </RNCamera>

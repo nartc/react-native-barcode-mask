@@ -62,7 +62,7 @@
     "@commitlint/cli": "8.3.5",
     "@commitlint/config-conventional": "8.3.4",
     "@types/jest": "25.1.1",
-    "@types/react": "16.9.17",
+    "@types/react": "16.9.19",
     "@types/react-native": "0.61.10",
     "commitizen": "4.0.3",
     "cz-conventional-changelog": "3.1.0",
@@ -70,11 +70,11 @@
     "lint-staged": "10.0.7",
     "react": "16.12.0",
     "react-native": "0.61.5",
-    "react-native-camera": "3.15.0",
-    "react-native-reanimated": "1.4.0",
+    "react-native-camera": "3.17.0",
+    "react-native-reanimated": "1.7.0",
     "semantic-release": "17.0.2",
     "tsdx": "0.12.3",
     "tslib": "1.10.0",
-    "typescript": "3.7.4"
+    "typescript": "3.7.5"
   }
 }

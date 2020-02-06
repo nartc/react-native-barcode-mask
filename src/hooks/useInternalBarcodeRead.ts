@@ -3,8 +3,8 @@ import { PixelRatio, Platform } from 'react-native';
 import { BarCodeType, Point, RNCamera, Size } from 'react-native-camera';
 
 const useInternalBarcodeReadIOS = (
+  barcodeRead: boolean,
   isFocused: boolean,
-  isFinderBoundingInitialized: boolean,
   finderX: number,
   finderY: number,
   finderWidth: number,
@@ -19,7 +19,7 @@ const useInternalBarcodeReadIOS = (
         | { origin: Point<string>; size: Size<string> };
       type: keyof BarCodeType;
     }) => {
-      if (!isFinderBoundingInitialized) {
+      if (!isFocused || barcodeRead) {
         return;
       }
 
@@ -27,29 +27,30 @@ const useInternalBarcodeReadIOS = (
         origin: { x, y },
         size: { width, height },
       } = event.bounds as { origin: Point<string>; size: Size<string> };
+
       if (
         Number(x) >= finderX &&
         Number(x) + Number(width) <= finderX + finderWidth &&
         Number(y) >= finderY &&
         Number(y) + Number(height) <= finderY + finderHeight
       ) {
-        processingReadBarcode(event.data);
-        return;
+        return processingReadBarcode(event.data);
       }
     },
     [
+      barcodeRead,
       isFocused,
-      isFinderBoundingInitialized,
       finderX,
       finderY,
       finderWidth,
       finderHeight,
+      processingReadBarcode,
     ]
   );
 
 const useInternalBarcodeReadAndroid = (
+  barcodeRead: boolean,
   isFocused: boolean,
-  isFinderBoundingInitialized: boolean,
   finderX: number,
   finderY: number,
   finderWidth: number,
@@ -64,7 +65,7 @@ const useInternalBarcodeReadAndroid = (
         | { origin: Point<string>; size: Size<string> };
       type: keyof BarCodeType;
     }) => {
-      if (!isFinderBoundingInitialized) {
+      if (!isFocused || barcodeRead) {
         return;
       }
 
@@ -128,12 +129,13 @@ const useInternalBarcodeReadAndroid = (
       }
     },
     [
+      barcodeRead,
       isFocused,
-      isFinderBoundingInitialized,
       finderX,
       finderY,
       finderWidth,
       finderHeight,
+      processingReadBarcode,
     ]
   );
 
