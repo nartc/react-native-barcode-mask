@@ -17,12 +17,12 @@ import {
 const useBarcodeRead = Platform.select({
   android: useBarcodeReadAndroid,
   ios: useBarcodeReadIOS,
-});
+}) as typeof useBarcodeReadIOS;
 
 const useCustomBarcodeRead = Platform.select({
   android: useCustomBarcodeReadAndroid,
   ios: useCustomBarcodeReadIOS,
-});
+}) as typeof useCustomBarcodeReadIOS;
 
 const BarcodeMaskWithOuterLayout = withOuterLayout(BarcodeMask);
 
