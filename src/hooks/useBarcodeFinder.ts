@@ -1,6 +1,6 @@
-import { CustomBarcodeRead } from 'interfaces';
-import { useCallback, useState } from 'react';
+import { Reducer, useCallback, useReducer, useState } from 'react';
 import { LayoutChangeEvent } from 'react-native';
+import { BoundingRect, CustomBarcodeRead } from '../interfaces';
 
 /**
  * @internal
@@ -14,10 +14,32 @@ export default (
   customBarcodeRead?: CustomBarcodeRead | number
 ) => {
   const [barcodeRead, setBarcodeRead] = useState(false);
-  const [finderWidth, setFinderWidth] = useState(0);
-  const [finderHeight, setFinderHeight] = useState(0);
-  const [finderX, setFinderX] = useState(0);
-  const [finderY, setFinderY] = useState(0);
+  const [state, dispatch] = useReducer<
+    Reducer<
+      BoundingRect,
+      {
+        type: 'SET';
+        payload: BoundingRect;
+      }
+    >
+  >(
+    (prev, action) => {
+      switch (action.type) {
+        case 'SET': {
+          return { ...prev, ...action.payload };
+        }
+        default: {
+          return prev;
+        }
+      }
+    },
+    {
+      width: 0,
+      height: 0,
+      x: 0,
+      y: 0,
+    }
+  );
   const _onBarcodeFinderLayoutChange = useCallback(
     (event: LayoutChangeEvent) => {
       const {
@@ -25,12 +47,9 @@ export default (
           layout: { height, width, x, y },
         },
       } = event;
-      setFinderWidth(width);
-      setFinderHeight(height);
-      setFinderX(x);
-      setFinderY(y);
+      dispatch({ type: 'SET', payload: { height, width, x, y } });
     },
-    [finderX, finderY, finderHeight, finderWidth]
+    [state.height, state.width, state.x, state.y]
   );
 
   let timeoutId = 0;
@@ -61,10 +80,10 @@ export default (
       customBarcodeRead && typeof customBarcodeRead === 'object'
         ? null
         : barcodeRead,
-    finderX,
-    finderY,
-    finderWidth,
-    finderHeight,
+    finderX: state.x,
+    finderY: state.y,
+    finderWidth: state.width,
+    finderHeight: state.height,
     onBarcodeFinderLayoutChange: _onBarcodeFinderLayoutChange,
     processingReadBarcode,
   };
