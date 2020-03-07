@@ -1,6 +1,11 @@
 # @nartc/react-native-barcode-mask
 
-
+![travis](https://badgen.net/travis/nartc/react-native-barcode-mask)
+![bundlephobia](https://badgen.net/bundlephobia/minzip/@nartc/react-native-barcode-mask)
+![downloads](https://badgen.net/npm/dt/@nartc/react-native-barcode-mask)
+![npm](https://badgen.net/npm/v/@nartc/react-native-barcode-mask)
+![license](https://badgen.net/github/license/nartc/react-native-barcode-mask)
+[![Known Vulnerabilities](https://snyk.io/test/github/nartc/react-native-barcode-mask/badge.svg?targetFile=package.json)](https://snyk.io/test/github/nartc/react-native-barcode-mask?targetFile=package.json)
 
 ![QR](https://i.imgur.com/CRImCD7.gif)
 ![PDF417](https://i.imgur.com/Q6Q65ox.gif)
