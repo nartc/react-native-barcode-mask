@@ -67,13 +67,13 @@
     "cz-conventional-changelog": "3.1.0",
     "husky": "4.2.3",
     "lint-staged": "10.0.8",
-    "react": "16.12.0",
+    "react": "16.13.0",
     "react-native": "0.61.5",
-    "react-native-camera": "3.17.0",
+    "react-native-camera": "3.19.0",
     "react-native-reanimated": "1.7.0",
     "semantic-release": "17.0.4",
     "tsdx": "0.12.3",
     "tslib": "1.11.1",
-    "typescript": "3.7.5"
+    "typescript": "3.8.3"
   }
 }
