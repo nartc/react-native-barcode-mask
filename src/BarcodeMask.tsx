@@ -3,7 +3,19 @@ import { LayoutChangeEvent, StyleSheet, View, ViewStyle } from 'react-native';
 import Animated, { Easing } from 'react-native-reanimated';
 import { WithOuterLayoutProps } from './interfaces';
 
-const { Value, Clock, block, cond, set, startClock, timing, eq } = Animated;
+const {
+  Value,
+  Clock,
+  block,
+  cond,
+  set,
+  startClock,
+  timing,
+  eq,
+  // clockRunning,
+  // stopClock,
+  // debug,
+} = Animated;
 
 type DimensionUnit = string | number;
 type EdgePosition = 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight';
@@ -193,6 +205,44 @@ const runTiming: RunTimingFn = (
   ]);
 };
 
+// const dimensionRunTiming: RunTimingFn = (
+//   clock: Animated.Clock,
+//   value: number,
+//   destination: number,
+//   duration: number
+// ) => {
+//   const timingState: Animated.TimingState = {
+//     finished: new Value(0),
+//     position: new Value(value),
+//     time: new Value(0),
+//     frameTime: new Value(0),
+//   };
+//
+//   const timingConfig: Animated.TimingConfig = {
+//     duration,
+//     toValue: new Value(destination),
+//     easing: Easing.inOut(Easing.ease),
+//   };
+//
+//   return block([
+//     cond(
+//       clockRunning(clock),
+//       [set(timingConfig.toValue as Animated.Value<number>, destination)],
+//       [
+//         set(timingState.finished, 0),
+//         set(timingState.time, 0),
+//         set(timingState.position, value),
+//         set(timingState.frameTime, 0),
+//         set(timingConfig.toValue as Animated.Value<number>, destination),
+//         startClock(clock),
+//       ]
+//     ),
+//     timing(clock, timingState, timingConfig),
+//     cond(timingState.finished, debug('stop clock', stopClock(clock))),
+//     timingState.position,
+//   ]);
+// };
+
 const noop = () => {};
 
 export const BarcodeMask: FC<BarcodeMaskProps> = memo(
@@ -218,24 +268,75 @@ export const BarcodeMask: FC<BarcodeMaskProps> = memo(
     outerBoundingRect,
     onOuterLayout,
   }) => {
+    const edgeBorderStyle = React.useRef<
+      {
+        [position in EdgePosition]: ViewStyle;
+      }
+    >({
+      topRight: {
+        borderRightWidth: edgeBorderWidth as number,
+        borderTopWidth: edgeBorderWidth as number,
+        borderTopRightRadius: edgeRadius,
+        top: -(edgeBorderWidth as number),
+        right: -(edgeBorderWidth as number),
+      },
+      topLeft: {
+        borderTopWidth: edgeBorderWidth as number,
+        borderLeftWidth: edgeBorderWidth as number,
+        borderTopLeftRadius: edgeRadius,
+        top: -(edgeBorderWidth as number),
+        left: -(edgeBorderWidth as number),
+      },
+      bottomRight: {
+        borderBottomWidth: edgeBorderWidth as number,
+        borderRightWidth: edgeBorderWidth as number,
+        borderBottomRightRadius: edgeRadius,
+        bottom: -(edgeBorderWidth as number),
+        right: -(edgeBorderWidth as number),
+      },
+      bottomLeft: {
+        borderBottomWidth: edgeBorderWidth as number,
+        borderLeftWidth: edgeBorderWidth as number,
+        borderBottomLeftRadius: edgeRadius,
+        bottom: -(edgeBorderWidth as number),
+        left: -(edgeBorderWidth as number),
+      },
+    });
+
     const _animatedLineDimension = (
       dimension: DimensionUnit | undefined,
       outerDimension: 'width' | 'height'
     ) => {
       const outer = outerBoundingRect?.[outerDimension] ?? 0;
-
       if (dimension) {
         if (typeof dimension === 'number') {
           return dimension * 0.9;
         }
-
         return dimension.endsWith('%')
           ? (Number(dimension.split('%')[0]) / 100) * outer * 0.9
           : Number(dimension.split(/\d+/)[0]) * outer * 0.9;
       }
-
       return outer * 0.9;
     };
+
+    const _width = React.useRef<number>(_animatedLineDimension(width, 'width'));
+    const _height = React.useRef<number>(
+      _animatedLineDimension(height, 'height')
+    );
+
+    // React.useEffect(() => {
+    //   const computedWidth = _animatedLineDimension(width, 'width');
+    //   if (computedWidth !== _width.current) {
+    //     _width.current = computedWidth;
+    //   }
+    // }, [width]);
+    //
+    // React.useEffect(() => {
+    //   const computedHeight = _animatedLineDimension(height, 'height');
+    //   if (computedHeight !== _height.current) {
+    //     _height.current = computedHeight;
+    //   }
+    // }, [height]);
 
     const _animatedValue = (
       dimension: DimensionUnit | undefined,
@@ -252,12 +353,11 @@ export const BarcodeMask: FC<BarcodeMaskProps> = memo(
 
     const _animatedLineStyle = () => {
       if (animatedLineOrientation === 'horizontal') {
-        const _width = _animatedLineDimension(width, 'width');
         const destination = _animatedValue(height, 'height');
         return {
           ...styles.animatedLine,
           height: animatedLineThickness,
-          width: _width,
+          width: _width.current,
           backgroundColor: animatedLineColor,
           top: runTimingFn!(
             new Clock(),
@@ -267,13 +367,11 @@ export const BarcodeMask: FC<BarcodeMaskProps> = memo(
           ),
         };
       }
-
-      const _height = _animatedLineDimension(height, 'height');
       const destination = _animatedValue(width, 'width');
       return {
         ...styles.animatedLine,
         width: animatedLineThickness,
-        height: _height,
+        height: _height.current,
         backgroundColor: animatedLineColor,
         left: runTimingFn!(
           new Clock(),
@@ -284,10 +382,6 @@ export const BarcodeMask: FC<BarcodeMaskProps> = memo(
       };
     };
 
-    const _applyMaskFrameStyle = () => {
-      return { backgroundColor, opacity: maskOpacity, flex: 1 };
-    };
-
     const _renderEdge = (edgePosition: EdgePosition) => {
       const defaultStyle = {
         width: edgeWidth,
@@ -295,61 +389,25 @@ export const BarcodeMask: FC<BarcodeMaskProps> = memo(
         borderColor: edgeColor,
         zIndex: 2,
       };
-
-      const borderWidth = edgeBorderWidth as number;
-      const borderRadius = edgeRadius as number;
-
-      const edgeBorderStyle: {
-        [position in typeof edgePosition]: ViewStyle;
-      } = {
-        topRight: {
-          borderRightWidth: borderWidth,
-          borderTopWidth: borderWidth,
-          borderTopRightRadius: borderRadius,
-          top: -borderWidth,
-          right: -borderWidth,
-        },
-        topLeft: {
-          borderTopWidth: borderWidth,
-          borderLeftWidth: borderWidth,
-          borderTopLeftRadius: borderRadius,
-          top: -borderWidth,
-          left: -borderWidth,
-        },
-        bottomRight: {
-          borderBottomWidth: borderWidth,
-          borderRightWidth: borderWidth,
-          borderBottomRightRadius: borderRadius,
-          bottom: -borderWidth,
-          right: -borderWidth,
-        },
-        bottomLeft: {
-          borderBottomWidth: borderWidth,
-          borderLeftWidth: borderWidth,
-          borderBottomLeftRadius: borderRadius,
-          bottom: -borderWidth,
-          left: -borderWidth,
-        },
-      };
-
       return (
         <View
           style={{
             ...defaultStyle,
             ...styles[edgePosition],
-            ...edgeBorderStyle[edgePosition],
+            ...edgeBorderStyle.current[edgePosition],
           }}
         />
       );
     };
 
-    const _width = _animatedLineDimension(width, 'width') / 0.9;
-    const _height = _animatedLineDimension(height, 'height') / 0.9;
-
     return (
       <View style={styles.container}>
         <View
-          style={{ ...styles.finder, width: _width, height: _height }}
+          style={{
+            ...styles.finder,
+            width: _width.current / 0.9,
+            height: _height.current / 0.9,
+          }}
           onLayout={onLayoutChange || noop}
         >
           {_renderEdge('topLeft')}
@@ -359,9 +417,14 @@ export const BarcodeMask: FC<BarcodeMaskProps> = memo(
           {showAnimatedLine && <Animated.View style={_animatedLineStyle()} />}
         </View>
         <View style={styles.maskOuter} onLayout={onOuterLayout || noop}>
-          <View style={{ ...styles.maskRow, ..._applyMaskFrameStyle() }} />
+          <View
+            style={{
+              ...styles.maskRow,
+              ...{ backgroundColor, opacity: maskOpacity, flex: 1 },
+            }}
+          />
           <View style={{ height, ...styles.maskCenter }}>
-            <View style={_applyMaskFrameStyle()} />
+            <View style={{ backgroundColor, opacity: maskOpacity, flex: 1 }} />
             <View
               style={{
                 ...styles.maskInner,
@@ -370,9 +433,14 @@ export const BarcodeMask: FC<BarcodeMaskProps> = memo(
                 borderRadius: edgeRadius,
               }}
             />
-            <View style={_applyMaskFrameStyle()} />
+            <View style={{ backgroundColor, opacity: maskOpacity, flex: 1 }} />
           </View>
-          <View style={{ ...styles.maskRow, ..._applyMaskFrameStyle() }} />
+          <View
+            style={{
+              ...styles.maskRow,
+              ...{ backgroundColor, opacity: maskOpacity, flex: 1 },
+            }}
+          />
         </View>
       </View>
     );
