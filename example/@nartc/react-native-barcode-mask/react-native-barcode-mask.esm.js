@@ -49,7 +49,33 @@ var runTiming = function runTiming(clock, value, destination, duration) {
     easing: Easing.inOut(Easing.ease)
   };
   return block([startClock(clock), timing(clock, timingState, timingConfig), cond(timingState.finished, [set(timingState.finished, 0), set(timingState.time, 0), set(timingState.frameTime, 0), set(timingState.position, cond(eq(timingState.position, destination), destination, value)), set(timingConfig.toValue, cond(eq(timingState.position, destination), value, destination))]), timingState.position]);
-};
+}; // const dimensionRunTiming: RunTimingFn = (
+//   clock: Animated.Clock,
+//   value: number,
+//   destination: number,
+//   duration: number
+// ) => {
+//   const timingState: Animated.TimingState = {
+//     finished: new Value(0),
+//     position: new Value(value),
+//     time: new Value(0),
+//     frameTime: new Value(0),
+//   };
+//
+//   const timingConfig: Animated.TimingConfig = {
+//     duration,
+//     toValue: new Value(destination),
+//     easing: Easing.inOut(Easing.ease),
+//   };
+//
+//   return block([
+//     startClock(clock),
+//     timing(clock, timingState, timingConfig),
+//     cond(timingState.finished, stopClock(clock)),
+//     timingState.position,
+//   ]);
+// };
+
 
 var noop = function noop() {};
 
@@ -65,6 +91,7 @@ var BarcodeMask = /*#__PURE__*/memo(function (_ref) {
       edgeWidth = _ref.edgeWidth,
       edgeRadius = _ref.edgeRadius,
       maskOpacity = _ref.maskOpacity,
+      animatedComponent = _ref.animatedComponent,
       animatedLineColor = _ref.animatedLineColor,
       animatedLineOrientation = _ref.animatedLineOrientation,
       animatedLineThickness = _ref.animatedLineThickness,
@@ -74,6 +101,41 @@ var BarcodeMask = /*#__PURE__*/memo(function (_ref) {
       onLayoutChange = _ref.onLayoutChange,
       outerBoundingRect = _ref.outerBoundingRect,
       onOuterLayout = _ref.onOuterLayout;
+  var edgeBorderStyle = React.useRef({
+    topRight: {
+      borderRightWidth: edgeBorderWidth,
+      borderTopWidth: edgeBorderWidth,
+      borderTopRightRadius: edgeRadius,
+      top: -edgeBorderWidth,
+      right: -edgeBorderWidth
+    },
+    topLeft: {
+      borderTopWidth: edgeBorderWidth,
+      borderLeftWidth: edgeBorderWidth,
+      borderTopLeftRadius: edgeRadius,
+      top: -edgeBorderWidth,
+      left: -edgeBorderWidth
+    },
+    bottomRight: {
+      borderBottomWidth: edgeBorderWidth,
+      borderRightWidth: edgeBorderWidth,
+      borderBottomRightRadius: edgeRadius,
+      bottom: -edgeBorderWidth,
+      right: -edgeBorderWidth
+    },
+    bottomLeft: {
+      borderBottomWidth: edgeBorderWidth,
+      borderLeftWidth: edgeBorderWidth,
+      borderBottomLeftRadius: edgeRadius,
+      bottom: -edgeBorderWidth,
+      left: -edgeBorderWidth
+    }
+  }); // const previousWidth = usePrevDimension(width, () => {
+  //   return _animatedLineDimension(width, 'width') * 0.9;
+  // });
+  // const previousHeight = usePrevDimension(height, () => {
+  //   return _animatedLineDimension(height, 'height') * 0.9;
+  // });
 
   var _animatedLineDimension = function _animatedLineDimension(dimension, outerDimension) {
     var _outerBoundingRect$ou;
@@ -85,7 +147,7 @@ var BarcodeMask = /*#__PURE__*/memo(function (_ref) {
         return dimension * 0.9;
       }
 
-      return dimension.endsWith('%') ? Number(dimension.split('%')[0]) / 100 * outer * 0.9 : Number(dimension.split(/\d+/)[0]) * outer * 0.9;
+      return dimension.endsWith('%') ? Number(dimension.split('%')[0]) / 100 * (outer || 1) * 0.9 : Number(dimension.split(/\d+/)[0]) * (outer || 1) * 0.9;
     }
 
     return outer * 0.9;
@@ -124,14 +186,6 @@ var BarcodeMask = /*#__PURE__*/memo(function (_ref) {
     });
   };
 
-  var _applyMaskFrameStyle = function _applyMaskFrameStyle() {
-    return {
-      backgroundColor: backgroundColor,
-      opacity: maskOpacity,
-      flex: 1
-    };
-  };
-
   var _renderEdge = function _renderEdge(edgePosition) {
     var defaultStyle = {
       width: edgeWidth,
@@ -139,40 +193,8 @@ var BarcodeMask = /*#__PURE__*/memo(function (_ref) {
       borderColor: edgeColor,
       zIndex: 2
     };
-    var borderWidth = edgeBorderWidth;
-    var borderRadius = edgeRadius;
-    var edgeBorderStyle = {
-      topRight: {
-        borderRightWidth: borderWidth,
-        borderTopWidth: borderWidth,
-        borderTopRightRadius: borderRadius,
-        top: -borderWidth,
-        right: -borderWidth
-      },
-      topLeft: {
-        borderTopWidth: borderWidth,
-        borderLeftWidth: borderWidth,
-        borderTopLeftRadius: borderRadius,
-        top: -borderWidth,
-        left: -borderWidth
-      },
-      bottomRight: {
-        borderBottomWidth: borderWidth,
-        borderRightWidth: borderWidth,
-        borderBottomRightRadius: borderRadius,
-        bottom: -borderWidth,
-        right: -borderWidth
-      },
-      bottomLeft: {
-        borderBottomWidth: borderWidth,
-        borderLeftWidth: borderWidth,
-        borderBottomLeftRadius: borderRadius,
-        bottom: -borderWidth,
-        left: -borderWidth
-      }
-    };
     return React.createElement(View, {
-      style: _extends({}, defaultStyle, {}, styles[edgePosition], {}, edgeBorderStyle[edgePosition])
+      style: _extends({}, defaultStyle, {}, styles[edgePosition], {}, edgeBorderStyle.current[edgePosition])
     });
   };
 
@@ -180,27 +202,49 @@ var BarcodeMask = /*#__PURE__*/memo(function (_ref) {
 
   var _height = _animatedLineDimension(height, 'height') / 0.9;
 
+  var _renderAnimated = function _renderAnimated() {
+    if (showAnimatedLine) {
+      if (animatedComponent) {
+        return animatedComponent(_width, _height);
+      }
+
+      return React.createElement(Animated.View, {
+        style: _animatedLineStyle()
+      });
+    }
+
+    return null;
+  };
+
   return React.createElement(View, {
     style: styles.container
   }, React.createElement(View, {
     style: _extends({}, styles.finder, {
+      // width: dimensionRunTiming(new Clock(), 0, 500, 2000),
+      // height: _height,
       width: _width,
       height: _height
     }),
     onLayout: onLayoutChange || noop
-  }, _renderEdge('topLeft'), _renderEdge('topRight'), _renderEdge('bottomLeft'), _renderEdge('bottomRight'), showAnimatedLine && React.createElement(Animated.View, {
-    style: _animatedLineStyle()
-  })), React.createElement(View, {
+  }, _renderEdge('topLeft'), _renderEdge('topRight'), _renderEdge('bottomLeft'), _renderEdge('bottomRight'), _renderAnimated()), React.createElement(View, {
     style: styles.maskOuter,
     onLayout: onOuterLayout || noop
   }, React.createElement(View, {
-    style: _extends({}, styles.maskRow, {}, _applyMaskFrameStyle())
+    style: _extends({}, styles.maskRow, {}, {
+      backgroundColor: backgroundColor,
+      opacity: maskOpacity,
+      flex: 1
+    })
   }), React.createElement(View, {
     style: _extends({
       height: height
     }, styles.maskCenter)
   }, React.createElement(View, {
-    style: _applyMaskFrameStyle()
+    style: {
+      backgroundColor: backgroundColor,
+      opacity: maskOpacity,
+      flex: 1
+    }
   }), React.createElement(View, {
     style: _extends({}, styles.maskInner, {
       width: width,
@@ -208,9 +252,17 @@ var BarcodeMask = /*#__PURE__*/memo(function (_ref) {
       borderRadius: edgeRadius
     })
   }), React.createElement(View, {
-    style: _applyMaskFrameStyle()
+    style: {
+      backgroundColor: backgroundColor,
+      opacity: maskOpacity,
+      flex: 1
+    }
   })), React.createElement(View, {
-    style: _extends({}, styles.maskRow, {}, _applyMaskFrameStyle())
+    style: _extends({}, styles.maskRow, {}, {
+      backgroundColor: backgroundColor,
+      opacity: maskOpacity,
+      flex: 1
+    })
   })));
 });
 BarcodeMask.defaultProps = {

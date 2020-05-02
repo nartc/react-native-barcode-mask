@@ -2,6 +2,7 @@ import React, { FC, memo } from 'react';
 import { LayoutChangeEvent, StyleSheet, View, ViewStyle } from 'react-native';
 import Animated, { Easing } from 'react-native-reanimated';
 import { WithOuterLayoutProps } from './interfaces';
+// import { usePrevDimension } from './internal/use-prev-dimension';
 
 const {
   Value,
@@ -14,7 +15,6 @@ const {
   eq,
   // clockRunning,
   // stopClock,
-  // debug,
 } = Animated;
 
 type DimensionUnit = string | number;
@@ -122,6 +122,13 @@ export interface BarcodeMaskProps extends WithOuterLayoutProps {
    */
   destinationValue?: number;
   /**
+   * @name animatedComponent
+   * @type Function
+   * @param width
+   * @param height
+   */
+  animatedComponent?: (width: number, height: number) => React.ReactElement;
+  /**
    * @name animatedLineThickness
    * @type number
    * @description Thickness of Animated Line
@@ -225,20 +232,9 @@ const runTiming: RunTimingFn = (
 //   };
 //
 //   return block([
-//     cond(
-//       clockRunning(clock),
-//       [set(timingConfig.toValue as Animated.Value<number>, destination)],
-//       [
-//         set(timingState.finished, 0),
-//         set(timingState.time, 0),
-//         set(timingState.position, value),
-//         set(timingState.frameTime, 0),
-//         set(timingConfig.toValue as Animated.Value<number>, destination),
-//         startClock(clock),
-//       ]
-//     ),
+//     startClock(clock),
 //     timing(clock, timingState, timingConfig),
-//     cond(timingState.finished, debug('stop clock', stopClock(clock))),
+//     cond(timingState.finished, stopClock(clock)),
 //     timingState.position,
 //   ]);
 // };
@@ -258,6 +254,7 @@ export const BarcodeMask: FC<BarcodeMaskProps> = memo(
     edgeWidth,
     edgeRadius,
     maskOpacity,
+    animatedComponent,
     animatedLineColor,
     animatedLineOrientation,
     animatedLineThickness,
@@ -302,6 +299,12 @@ export const BarcodeMask: FC<BarcodeMaskProps> = memo(
         left: -(edgeBorderWidth as number),
       },
     });
+    // const previousWidth = usePrevDimension(width, () => {
+    //   return _animatedLineDimension(width, 'width') * 0.9;
+    // });
+    // const previousHeight = usePrevDimension(height, () => {
+    //   return _animatedLineDimension(height, 'height') * 0.9;
+    // });
 
     const _animatedLineDimension = (
       dimension: DimensionUnit | undefined,
@@ -313,30 +316,11 @@ export const BarcodeMask: FC<BarcodeMaskProps> = memo(
           return dimension * 0.9;
         }
         return dimension.endsWith('%')
-          ? (Number(dimension.split('%')[0]) / 100) * outer * 0.9
-          : Number(dimension.split(/\d+/)[0]) * outer * 0.9;
+          ? (Number(dimension.split('%')[0]) / 100) * (outer || 1) * 0.9
+          : Number(dimension.split(/\d+/)[0]) * (outer || 1) * 0.9;
       }
       return outer * 0.9;
     };
-
-    const _width = React.useRef<number>(_animatedLineDimension(width, 'width'));
-    const _height = React.useRef<number>(
-      _animatedLineDimension(height, 'height')
-    );
-
-    // React.useEffect(() => {
-    //   const computedWidth = _animatedLineDimension(width, 'width');
-    //   if (computedWidth !== _width.current) {
-    //     _width.current = computedWidth;
-    //   }
-    // }, [width]);
-    //
-    // React.useEffect(() => {
-    //   const computedHeight = _animatedLineDimension(height, 'height');
-    //   if (computedHeight !== _height.current) {
-    //     _height.current = computedHeight;
-    //   }
-    // }, [height]);
 
     const _animatedValue = (
       dimension: DimensionUnit | undefined,
@@ -353,11 +337,12 @@ export const BarcodeMask: FC<BarcodeMaskProps> = memo(
 
     const _animatedLineStyle = () => {
       if (animatedLineOrientation === 'horizontal') {
+        const _width = _animatedLineDimension(width, 'width');
         const destination = _animatedValue(height, 'height');
         return {
           ...styles.animatedLine,
           height: animatedLineThickness,
-          width: _width.current,
+          width: _width,
           backgroundColor: animatedLineColor,
           top: runTimingFn!(
             new Clock(),
@@ -367,11 +352,12 @@ export const BarcodeMask: FC<BarcodeMaskProps> = memo(
           ),
         };
       }
+      const _height = _animatedLineDimension(height, 'height');
       const destination = _animatedValue(width, 'width');
       return {
         ...styles.animatedLine,
         width: animatedLineThickness,
-        height: _height.current,
+        height: _height,
         backgroundColor: animatedLineColor,
         left: runTimingFn!(
           new Clock(),
@@ -400,13 +386,30 @@ export const BarcodeMask: FC<BarcodeMaskProps> = memo(
       );
     };
 
+    const _width = _animatedLineDimension(width, 'width') / 0.9;
+    const _height = _animatedLineDimension(height, 'height') / 0.9;
+
+    const _renderAnimated = () => {
+      if (showAnimatedLine) {
+        if (animatedComponent) {
+          return animatedComponent(_width, _height);
+        }
+
+        return <Animated.View style={_animatedLineStyle()} />;
+      }
+
+      return null;
+    };
+
     return (
       <View style={styles.container}>
         <View
           style={{
             ...styles.finder,
-            width: _width.current / 0.9,
-            height: _height.current / 0.9,
+            // width: dimensionRunTiming(new Clock(), 0, 500, 2000),
+            // height: _height,
+            width: _width,
+            height: _height,
           }}
           onLayout={onLayoutChange || noop}
         >
@@ -414,7 +417,7 @@ export const BarcodeMask: FC<BarcodeMaskProps> = memo(
           {_renderEdge('topRight')}
           {_renderEdge('bottomLeft')}
           {_renderEdge('bottomRight')}
-          {showAnimatedLine && <Animated.View style={_animatedLineStyle()} />}
+          {_renderAnimated()}
         </View>
         <View style={styles.maskOuter} onLayout={onOuterLayout || noop}>
           <View

@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import React, { FC } from 'react';
 import { LayoutChangeEvent } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { WithOuterLayoutProps } from './interfaces';
@@ -97,6 +97,13 @@ export interface BarcodeMaskProps extends WithOuterLayoutProps {
      * @default Computed by the length of the respective orientation minus the `animatedLineThickness`
      */
     destinationValue?: number;
+    /**
+     * @name animatedComponent
+     * @type Function
+     * @param width
+     * @param height
+     */
+    animatedComponent?: (width: number, height: number) => React.ReactElement;
     /**
      * @name animatedLineThickness
      * @type number
