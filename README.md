@@ -42,26 +42,27 @@ yarn add @nartc/react-native-barcode-mask
 
 ### BarcodeMaskProps
 
-| name                    | type                       | description                                                                                       | default                                                      |
-| ----------------------- | -------------------------- | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
-| width                   | DimensionUnit              | Width of the Barcode Finder Area                                                                  | 280                                                          |
-| height                  | DimensionUnit              | Height of the Barcode Finder Area                                                                 | 230                                                          |
-| edgeWidth               | DimensionUnit              | Width of corner edges                                                                             | 20                                                           |
-| edgeHeight              | DimensionUnit              | Height of corner edges                                                                            | 20                                                           |
-| edgeColor               | string                     | Color of corner edges                                                                             | #fff                                                         |
-| edgeRadius              | number                     | Border Radius of corner edges                                                                     | 0                                                            |
-| edgeBorderWidth         | DimensionUnit              | Thickness of corner edges                                                                         | 4                                                            |
-| backgroundColor         | string                     | Background color of Outer Finder Area                                                             | #eee                                                         |
-| maskOpacity             | number                     | Opacity of Outer Finder Area                                                                      | 1                                                            |
-| showAnimatedLine        | boolean                    | Whether to show Animated Line                                                                     | true                                                         |
-| startValue              | number                     | Start value of Animated Line (only applicable if `showAnimatedLine` is set to `true`)             | 0                                                            |
-| destinationValue        | number                     | Destination value of Animated Line (depends on`animatedLineOrientation`)                          | `Length of respective orientation` - `animatedLineThickness` |
-| animatedLineThickness   | DimensionUnit              | Thickness of Animated Line                                                                        | 2                                                            |
-| animatedLineOrientation | 'vertical' or 'horizontal' | Orientation that the Animated Line will be drawn                                                  | 'horizontal'                                                 |
-| animatedLineColor       | string                     | Color of Animated Line                                                                            | #fff                                                         |
-| animationDuration       | number                     | Duration of Animated Line animation (in ms)                                                       | 20000                                                        |
-| runTimingFn             | RunTimingFn                | Function to trigger the animation                                                                 | internal `runTiming` function                                |
-| onLayoutChange          | OnLayoutChangeHandler      | Handler to handle LayoutChange. Useful if you want to only detect barcode inside the Finder Area. | `noop`                                                       |
+| name                    | type                                            | description                                                                                                                                       | default                                                      |
+| ----------------------- | ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| width                   | DimensionUnit                                   | Width of the Barcode Finder Area                                                                                                                  | 280                                                          |
+| height                  | DimensionUnit                                   | Height of the Barcode Finder Area                                                                                                                 | 230                                                          |
+| edgeWidth               | DimensionUnit                                   | Width of corner edges                                                                                                                             | 20                                                           |
+| edgeHeight              | DimensionUnit                                   | Height of corner edges                                                                                                                            | 20                                                           |
+| edgeColor               | string                                          | Color of corner edges                                                                                                                             | #fff                                                         |
+| edgeRadius              | number                                          | Border Radius of corner edges                                                                                                                     | 0                                                            |
+| edgeBorderWidth         | DimensionUnit                                   | Thickness of corner edges                                                                                                                         | 4                                                            |
+| backgroundColor         | string                                          | Background color of Outer Finder Area                                                                                                             | #eee                                                         |
+| maskOpacity             | number                                          | Opacity of Outer Finder Area                                                                                                                      | 1                                                            |
+| showAnimatedLine        | boolean                                         | Whether to show Animated Line                                                                                                                     | true                                                         |
+| startValue              | number                                          | Start value of Animated Line (only applicable if `showAnimatedLine` is set to `true`)                                                             | 0                                                            |
+| destinationValue        | number                                          | Destination value of Animated Line (depends on`animatedLineOrientation`)                                                                          | `Length of respective orientation` - `animatedLineThickness` |
+| animatedComponent       | (width: number, height: number) => ReactElement | Allow consumers to provide a Render Prop to render custom animated component. Render Prop will be executed with the computed `width` and `height` | null                                                         |
+| animatedLineThickness   | DimensionUnit                                   | Thickness of Animated Line                                                                                                                        | 2                                                            |
+| animatedLineOrientation | 'vertical' or 'horizontal'                      | Orientation that the Animated Line will be drawn                                                                                                  | 'horizontal'                                                 |
+| animatedLineColor       | string                                          | Color of Animated Line                                                                                                                            | #fff                                                         |
+| animationDuration       | number                                          | Duration of Animated Line animation (in ms)                                                                                                       | 20000                                                        |
+| runTimingFn             | RunTimingFn                                     | Function to trigger the animation                                                                                                                 | internal `runTiming` function                                |
+| onLayoutChange          | OnLayoutChangeHandler                           | Handler to handle LayoutChange. Useful if you want to only detect barcode inside the Finder Area.                                                 | `noop`                                                       |
 
 ### RunTimingFn
 
@@ -111,6 +112,7 @@ const {
   barcodeTypes={barcodeRead ? [] : [RNCamera.Constants.BarCodeType.qr]}
 />
 ```
+
 **NOTE: I noticed that this trick "kind of stopped" working since couple of the latest issue ago. Haven't looked into the commit log of `react-native-camera` but `barcodeRead` is returned for the sake of `barcodeRead`, frequency of scanning barcode is handled internally now.**
 
 2. `onBarcodeRead`: This is a handler that the hook returns so you can pass to `onBarCodeRead` prop on `RNCamera`
@@ -133,7 +135,21 @@ Just like the normal `useBarcodeRead()`, `useCustomBarcodeRead` takes in: `isFoc
 
 ```typescript jsx
 const [customBarcodeRead, setCustomBarcodeRead] = useState(false);
-const {} = useCustomBarcodeRead(isFocused, dataProcessor, processedData => {/*do stuff*/}, {beforeScan: () => { setCustomBarcodeRead(true); }, afterScan: () => { setCustomBarcodeRead(false) }});
+const {} = useCustomBarcodeRead(
+  isFocused,
+  dataProcessor,
+  processedData => {
+    /*do stuff*/
+  },
+  {
+    beforeScan: () => {
+      setCustomBarcodeRead(true);
+    },
+    afterScan: () => {
+      setCustomBarcodeRead(false);
+    },
+  }
+);
 ```
 
 **NOTE:** When `beforeScan` and `afterScan` are provided, internal `barcodeRead` state will be returned as `null`.
