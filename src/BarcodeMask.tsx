@@ -2,20 +2,8 @@ import React, { FC, memo } from 'react';
 import { LayoutChangeEvent, StyleSheet, View, ViewStyle } from 'react-native';
 import Animated, { Easing } from 'react-native-reanimated';
 import { WithOuterLayoutProps } from './interfaces';
-// import { usePrevDimension } from './internal/use-prev-dimension';
 
-const {
-  Value,
-  Clock,
-  block,
-  cond,
-  set,
-  startClock,
-  timing,
-  eq,
-  // clockRunning,
-  // stopClock,
-} = Animated;
+const { Value, Clock, block, cond, set, startClock, timing, eq } = Animated;
 
 type DimensionUnit = string | number;
 type EdgePosition = 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight';
@@ -212,33 +200,6 @@ const runTiming: RunTimingFn = (
   ]);
 };
 
-// const dimensionRunTiming: RunTimingFn = (
-//   clock: Animated.Clock,
-//   value: number,
-//   destination: number,
-//   duration: number
-// ) => {
-//   const timingState: Animated.TimingState = {
-//     finished: new Value(0),
-//     position: new Value(value),
-//     time: new Value(0),
-//     frameTime: new Value(0),
-//   };
-//
-//   const timingConfig: Animated.TimingConfig = {
-//     duration,
-//     toValue: new Value(destination),
-//     easing: Easing.inOut(Easing.ease),
-//   };
-//
-//   return block([
-//     startClock(clock),
-//     timing(clock, timingState, timingConfig),
-//     cond(timingState.finished, stopClock(clock)),
-//     timingState.position,
-//   ]);
-// };
-
 const noop = () => {};
 
 export const BarcodeMask: FC<BarcodeMaskProps> = memo(
@@ -299,12 +260,6 @@ export const BarcodeMask: FC<BarcodeMaskProps> = memo(
         left: -(edgeBorderWidth as number),
       },
     });
-    // const previousWidth = usePrevDimension(width, () => {
-    //   return _animatedLineDimension(width, 'width') * 0.9;
-    // });
-    // const previousHeight = usePrevDimension(height, () => {
-    //   return _animatedLineDimension(height, 'height') * 0.9;
-    // });
 
     const _animatedLineDimension = (
       dimension: DimensionUnit | undefined,
@@ -404,14 +359,12 @@ export const BarcodeMask: FC<BarcodeMaskProps> = memo(
     return (
       <View style={styles.container}>
         <View
+          onLayout={onLayoutChange || noop}
           style={{
             ...styles.finder,
-            // width: dimensionRunTiming(new Clock(), 0, 500, 2000),
-            // height: _height,
             width: _width,
             height: _height,
           }}
-          onLayout={onLayoutChange || noop}
         >
           {_renderEdge('topLeft')}
           {_renderEdge('topRight')}

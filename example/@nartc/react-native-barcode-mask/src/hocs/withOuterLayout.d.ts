@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ComponentType } from 'react';
 import { LayoutChangeEvent } from 'react-native';
 import { BoundingRect, WithOuterLayoutProps } from '../interfaces';
 export interface WithOuterLayoutHocState {

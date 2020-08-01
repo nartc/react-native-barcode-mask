@@ -49,33 +49,7 @@ var runTiming = function runTiming(clock, value, destination, duration) {
     easing: Easing.inOut(Easing.ease)
   };
   return block([startClock(clock), timing(clock, timingState, timingConfig), cond(timingState.finished, [set(timingState.finished, 0), set(timingState.time, 0), set(timingState.frameTime, 0), set(timingState.position, cond(eq(timingState.position, destination), destination, value)), set(timingConfig.toValue, cond(eq(timingState.position, destination), value, destination))]), timingState.position]);
-}; // const dimensionRunTiming: RunTimingFn = (
-//   clock: Animated.Clock,
-//   value: number,
-//   destination: number,
-//   duration: number
-// ) => {
-//   const timingState: Animated.TimingState = {
-//     finished: new Value(0),
-//     position: new Value(value),
-//     time: new Value(0),
-//     frameTime: new Value(0),
-//   };
-//
-//   const timingConfig: Animated.TimingConfig = {
-//     duration,
-//     toValue: new Value(destination),
-//     easing: Easing.inOut(Easing.ease),
-//   };
-//
-//   return block([
-//     startClock(clock),
-//     timing(clock, timingState, timingConfig),
-//     cond(timingState.finished, stopClock(clock)),
-//     timingState.position,
-//   ]);
-// };
-
+};
 
 var noop = function noop() {};
 
@@ -130,12 +104,7 @@ var BarcodeMask = /*#__PURE__*/memo(function (_ref) {
       bottom: -edgeBorderWidth,
       left: -edgeBorderWidth
     }
-  }); // const previousWidth = usePrevDimension(width, () => {
-  //   return _animatedLineDimension(width, 'width') * 0.9;
-  // });
-  // const previousHeight = usePrevDimension(height, () => {
-  //   return _animatedLineDimension(height, 'height') * 0.9;
-  // });
+  });
 
   var _animatedLineDimension = function _animatedLineDimension(dimension, outerDimension) {
     var _outerBoundingRect$ou;
@@ -219,13 +188,11 @@ var BarcodeMask = /*#__PURE__*/memo(function (_ref) {
   return React.createElement(View, {
     style: styles.container
   }, React.createElement(View, {
+    onLayout: onLayoutChange || noop,
     style: _extends({}, styles.finder, {
-      // width: dimensionRunTiming(new Clock(), 0, 500, 2000),
-      // height: _height,
       width: _width,
       height: _height
-    }),
-    onLayout: onLayoutChange || noop
+    })
   }, _renderEdge('topLeft'), _renderEdge('topRight'), _renderEdge('bottomLeft'), _renderEdge('bottomRight'), _renderAnimated()), React.createElement(View, {
     style: styles.maskOuter,
     onLayout: onOuterLayout || noop
