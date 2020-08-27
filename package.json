@@ -61,7 +61,7 @@
     "@commitlint/cli": "9.1.2",
     "@commitlint/config-conventional": "9.1.2",
     "@types/jest": "26.0.10",
-    "@types/react": "16.9.46",
+    "@types/react": "16.9.48",
     "@types/react-native": "0.63.9",
     "commitizen": "4.2.0",
     "cz-conventional-changelog": "3.3.0",
