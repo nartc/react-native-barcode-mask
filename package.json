@@ -60,7 +60,7 @@
   "devDependencies": {
     "@commitlint/cli": "9.1.2",
     "@commitlint/config-conventional": "9.1.2",
-    "@types/jest": "26.0.10",
+    "@types/jest": "26.0.13",
     "@types/react": "16.9.48",
     "@types/react-native": "0.63.11",
     "commitizen": "4.2.0",
