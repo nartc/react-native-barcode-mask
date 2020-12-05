@@ -65,7 +65,7 @@
     "@types/react-native": "0.63.35",
     "commitizen": "4.2.1",
     "cz-conventional-changelog": "3.3.0",
-    "husky": "4.3.0",
+    "husky": "4.3.4",
     "lint-staged": "10.4.0",
     "react": "16.13.1",
     "react-native": "0.63.2",
