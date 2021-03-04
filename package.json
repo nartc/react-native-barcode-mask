@@ -70,7 +70,7 @@
     "react": "16.13.1",
     "react-native": "0.63.2",
     "react-native-camera": "3.43.0",
-    "react-native-reanimated": "1.13.1",
+    "react-native-reanimated": "2.0.0",
     "semantic-release": "17.3.7",
     "tsdx": "0.14.0",
     "tslib": "2.0.1",
