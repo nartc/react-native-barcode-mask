@@ -1,17 +1,18 @@
 {
-  "name": "@nartc/react-native-barcode-mask",
-  "version": "0.0.0-development",
+  "name": "@nahrae/react-native-barcode-mask",
+  "version": "0.0.2",
   "license": "MIT",
-  "author": "Chau Tran",
+  "author": "Nahrae Jin",
   "main": "dist/index.js",
   "module": "dist/react-native-barcode-mask.esm.js",
   "typings": "dist/index.d.ts",
+  "description": "This is a full copy of @nartc/react-native-barcode-mask, and I published this for only myself. Please don't use this. I will unpublish this as soon as @nartc fix this issue. https://github.com/nartc/react-native-barcode-mask/issues/262",
   "files": [
     "dist"
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/nartc/react-native-barcode-mask.git"
+    "url": "https://github.com/railsjack/react-native-barcode-mask.git"
   },
   "scripts": {
     "start": "tsdx watch",

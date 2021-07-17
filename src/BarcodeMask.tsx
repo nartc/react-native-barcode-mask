@@ -1,6 +1,6 @@
 import React, { FC, memo } from 'react';
 import { LayoutChangeEvent, StyleSheet, View, ViewStyle } from 'react-native';
-import Animated, { Easing } from 'react-native-reanimated';
+import Animated, { EasingNode } from 'react-native-reanimated';
 import { WithOuterLayoutProps } from './interfaces';
 
 const { Value, Clock, block, cond, set, startClock, timing, eq } = Animated;
@@ -177,7 +177,7 @@ const runTiming: RunTimingFn = (
   const timingConfig: Animated.TimingConfig = {
     duration,
     toValue: new Value(destination),
-    easing: Easing.inOut(Easing.ease),
+    easing: EasingNode.inOut(EasingNode.ease),
   };
 
   return block([
