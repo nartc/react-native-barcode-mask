@@ -63,7 +63,7 @@
     "@types/jest": "26.0.22",
     "@types/react": "17.0.5",
     "@types/react-native": "0.63.35",
-    "commitizen": "4.2.1",
+    "commitizen": "4.2.4",
     "cz-conventional-changelog": "3.3.0",
     "husky": "7.0.1",
     "lint-staged": "11.0.1",
