@@ -62,7 +62,7 @@
     "@commitlint/config-conventional": "11.0.0",
     "@types/jest": "26.0.22",
     "@types/react": "17.0.5",
-    "@types/react-native": "0.63.35",
+    "@types/react-native": "0.64.12",
     "commitizen": "4.2.1",
     "cz-conventional-changelog": "3.3.0",
     "husky": "7.0.1",
