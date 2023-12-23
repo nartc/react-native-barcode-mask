@@ -68,7 +68,7 @@
     "husky": "7.0.2",
     "lint-staged": "11.1.1",
     "react": "16.13.1",
-    "react-native": "0.64.1",
+    "react-native": "0.72.0",
     "react-native-camera": "4.0.3",
     "react-native-reanimated": "2.0.1",
     "semantic-release": "17.3.7",
